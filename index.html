@@ -2124,7 +2124,7 @@ function copyHousecallDetails() {
             }
         }
         function fetchConfiguration() {
-  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+  firebase.database().ref('https://pca-navigation-tool-default-rtdb.firebaseio.com/configuration/clinicianSettings').once('value').then(function(snapshot) {
     var config = snapshot.val();
     
     // Apply the settings to your tool
@@ -2160,7 +2160,7 @@ function hideConfigPage() {
 
 // Fetch the configuration settings from Firebase
 function loadConfiguration() {
-  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+  firebase.database().ref('https://pca-navigation-tool-default-rtdb.firebaseio.com/configuration/clinicianSettings').once('value').then(function(snapshot) {
     var config = snapshot.val();
     document.getElementById('PASameDayToggle').checked = config.PASameDayEnabled;
     document.getElementById('ANPSameDayToggle').checked = config.ANPSameDayEnabled;
@@ -2192,7 +2192,7 @@ window.onload = function() {
 };
 function applyConfiguration() {
   // Fetch configuration from Firebase
-  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+  firebase.database().ref('https://pca-navigation-tool-default-rtdb.firebaseio.com/configuration/clinicianSettings').once('value').then(function(snapshot) {
     var config = snapshot.val();
 
     // Check if the configuration exists

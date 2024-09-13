@@ -226,6 +226,8 @@
         <button onclick="location.href='mailto:christopher.bryant3@wales.nhs.uk'">Feedback</button>
         <br>
         <button onclick="startOver()">Start Over</button>
+        <br>
+        <button id="configButton" onclick="showConfigPage()">Configure Tool</button>
     </div>
 
     <!-- TITLE -->
@@ -233,6 +235,14 @@
         <h1>PCA Navigation Assistant</h1>
         <div id="question-container">
     <!-- QUESTIONS -->
+    <div id="configPage" style="display:none;">
+        <h2>Configuration Page</h2>
+        <label><input type="checkbox" id="physicianAssociateToggle"> Physician Associate</label><br>
+        <label><input type="checkbox" id="gpToggle"> General Practitioner</label><br>
+        <label><input type="checkbox" id="nurseToggle"> Nurse</label><br>
+        <button onclick="saveConfiguration()">Save Settings</button>
+        <button onclick="hideConfigPage()">Close</button>
+      </div>
 	<div class="question" id="q0">
 		<div class="script-box">
         <img src="https://img.icons8.com/ios/50/000000/speech-bubble.png" alt="Speech Bubble Icon" class="icon">
@@ -1760,8 +1770,33 @@
         &copy; Afon Elai Partnership 2024
     </div>
 
+<!-- Firebase SDK -->
+        <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDqI-0LbeLDqd8En6AhttjWWXZVJ9Ipc-M",
+          authDomain: "pca-navigation-tool.firebaseapp.com",
+          projectId: "pca-navigation-tool",
+          storageBucket: "pca-navigation-tool.appspot.com",
+          messagingSenderId: "256439703134",
+          appId: "1:256439703134:web:860afec0a27ba6e930c6cf",
+          measurementId: "G-YJQ6N4S0VV"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
 
-    <script>
+<!-- Javascript functions -->
+        <script>
         let historyStack = [];
 
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -2088,6 +2123,74 @@ function copyHousecallDetails() {
                 showQuestion('GP_routine_after_4pm');
             }
         }
+        function fetchConfiguration() {
+  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+    var config = snapshot.val();
+    
+    // Apply the settings to your tool
+    if (config) {
+      document.getElementById('PASameDayOption').style.display = config.PASameDayEnabled ? 'block' : 'none';
+      document.getElementById('ANPSameDayOption').style.display = config.ANPSameDayEnabled ? 'block' : 'none';
+      document.getElementById('PharmacistSameDayOption').style.display = config.PharmacistSameDayEnabled ? 'block' : 'none';
+    }
+  }).catch(function(error) {
+    console.error('Error fetching configuration:', error);
+  });
+}
+
+// Call this function when the tool loads
+window.onload = function() {
+  fetchConfiguration();
+};
+
+// Password-protect the configuration page
+function showConfigPage() {
+  var password = prompt("Please enter the manager password:");
+  if (password === "admin") {
+    document.getElementById('configPage').style.display = 'block';
+    loadConfiguration(); // Load current settings from Firebase
+  } else {
+    alert("Incorrect password.");
+  }
+}
+
+function hideConfigPage() {
+  document.getElementById('configPage').style.display = 'none';
+}
+
+// Fetch the configuration settings from Firebase
+function loadConfiguration() {
+  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+    var config = snapshot.val();
+    document.getElementById('PASameDayToggle').checked = config.PASameDayEnabled;
+    document.getElementById('ANPSameDayToggle').checked = config.ANPSameDayEnabled;
+    document.getElementById('PharmacistSameDayToggle').checked = config.PharmacistSameDayEnabled;
+  });
+}
+
+// Save updated configuration settings to Firebase
+function saveConfiguration() {
+  var PASameDayEnabled= document.getElementById('PASameDayToggle').checked;
+  var ANPSameDayEnabled = document.getElementById('ANPSameDayToggle').checked;
+  var PharmacistSameDayEnabled = document.getElementById('PharmacistSameDayToggle').checked;
+
+  firebase.database().ref('configuration/clinicianSettings').set({
+    PASameDayEnabled: PASameDayEnabled,
+    ANPSameDayEnabled: ANPSameDayEnabled,
+    PharmacistSameDayEnabled: PharmacistSameDayEnabled
+  }).then(function() {
+    alert('Configuration saved successfully!');
+    hideConfigPage();
+  }).catch(function(error) {
+    console.error('Error saving configuration:', error);
+  });
+}
+
+// Call this function when the page loads to apply the settings
+window.onload = function() {
+  fetchConfiguration();
+};
+
 
     </script>
 </body>

@@ -774,7 +774,7 @@
             <p>Which clinician is this suitable for?</p>
             <div class="options-row">
             <!-- Physician Associate -->
-                <div class="option" onclick="handleOption('AHP_sameday')">
+                <div id="PASameDayOption" class="option" onclick="handleOption('AHP_sameday')">
                     <img src="https://img.icons8.com/ios/50/000000/stethoscope.png" alt="Physician Associate Icon" class="icon">
                     <h3>Physician Associate</h3>
                     <ul>
@@ -788,7 +788,7 @@
                 </div>
 
             <!-- Advanced Nurse Practitioner -->
-                <div class="option" onclick="handleOption('ANP_sameday')">
+                <div id="ANPSameDayOption" class="option" onclick="handleOption('ANP_sameday')">
                     <img src="https://img.icons8.com/ios/50/000000/stethoscope.png" alt="ANP Icon" class="icon">
                     <h3>Advanced Nurse Practitioner</h3>
                     <ul>
@@ -830,7 +830,7 @@
                 
 
             <!-- Practice Pharmacist-->
-                <div class="option" onclick="handleOption('Pharmacist_sameday')">
+                <div id="PharmacistSameDayOption" class="option" onclick="handleOption('Pharmacist_sameday')">
                     <img src="https://img.icons8.com/ios/50/000000/pills.png" alt="Pharmacist Icon" class="icon">
                     <h3>Practice Pharmacist</h3>
                     <ul>
@@ -2189,6 +2189,31 @@ function saveConfiguration() {
 // Call this function when the page loads to apply the settings
 window.onload = function() {
   fetchConfiguration();
+};
+function applyConfiguration() {
+  // Fetch configuration from Firebase
+  firebase.database().ref('configuration/clinicianSettings').once('value').then(function(snapshot) {
+    var config = snapshot.val();
+
+    // Check if the configuration exists
+    if (config) {
+      // Show or hide the Physician Associate option
+      document.getElementById('PASameDayOption').style.display = config.PASameDayEnabled ? 'block' : 'none';
+
+      // Show or hide the GP option
+      document.getElementById('ANPSameDayOption').style.display = config.ANPSameDayEnabled ? 'block' : 'none';
+
+      // Show or hide the Nurse option
+      document.getElementById('PharmacistSameDayOption').style.display = config.PharmacistSameDayEnabled ? 'block' : 'none';
+    }
+  }).catch(function(error) {
+    console.error('Error fetching configuration:', error);
+  });
+}
+
+// Call this function on page load
+window.onload = function() {
+  applyConfiguration();
 };
 
 
